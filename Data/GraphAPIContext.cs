@@ -22,9 +22,9 @@ namespace GraphAPI.Data
                 entity.HasKey(e => e.nodeid);
                 entity.Property(e => e.name);
                 entity.Property(e => e.classification);
-                entity.Property(e => e.copywriteowner);
+                entity.Property(e => e.copyrightowner);
                 entity.Property(e => e.version);
-                entity.Property(e => e.payload).HasColumnType("json");
+                entity.Property(e => e.payload).HasColumnType("jsonb");
             });
 
             modelBuilder.Entity<graph>(entity =>
@@ -37,8 +37,8 @@ namespace GraphAPI.Data
             {
                 entity.HasKey(e => e.nodetypeid);
                 entity.Property(e => e.name);
-                entity.Property(e => e.fields).HasColumnType("json");
-                entity.Property(e => e.settings).HasColumnType("json");
+                entity.Property(e => e.fields).HasColumnType("jsonb");
+                entity.Property(e => e.settings).HasColumnType("jsonb");
             });
         }
 

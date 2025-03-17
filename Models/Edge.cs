@@ -11,7 +11,7 @@ namespace GraphAPI.Models
         [SwaggerIgnore]
         public long edgeid { get; set; }
         public long edgetypeid { get; set; }
-        public long head_node { get; set; }
-        public long tail_node { get; set; }
+        public long headnodeid { get; set; }
+        public long tailnodeid { get; set; }
     }
 }

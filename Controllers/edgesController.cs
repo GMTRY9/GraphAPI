@@ -18,7 +18,7 @@ namespace GraphAPI.Controllers
 
         // GET: api/edges
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<edge>>> Getedge()
+        public async Task<ActionResult<IEnumerable<edge>>> GetAlledges()
         {
             return await _context.edge.ToListAsync();
         }
@@ -88,14 +88,14 @@ namespace GraphAPI.Controllers
                 edge.edgetypeid = partial_edge.edgetypeid;
             }
 
-            if (partial_edge.head_node != 0)
+            if (partial_edge.headnodeid != 0)
             {
-                edge.head_node = partial_edge.head_node;
+                edge.headnodeid = partial_edge.headnodeid;
             }
 
-            if (partial_edge.tail_node != 0)
+            if (partial_edge.tailnodeid != 0)
             {
-                edge.tail_node = partial_edge.tail_node;
+                edge.tailnodeid = partial_edge.tailnodeid;
             }
 
             try

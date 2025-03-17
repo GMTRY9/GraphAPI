@@ -17,15 +17,15 @@ namespace GraphAPI.Models
 
         public long graphid { get; set; }
 
-        public long nodetype { get; set; }
+        public long nodetypeid { get; set; }
 
         public long classification { get; set; }
 
-        public string copywriteowner { get; set; }
+        public string copyrightowner { get; set; }
 
         public string version { get; set; }
 
-        [Column(TypeName = "json")]
+        [Column(TypeName = "jsonb")]
         public JsonDocument payload { get; set; }
     }
 }

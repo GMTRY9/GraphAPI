@@ -2,8 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using GraphAPI.Data;
 using GraphAPI.Models;
-using System.Security.AccessControl;
-using static NpgsqlTypes.NpgsqlTsQuery;
 
 namespace GraphAPI.Controllers
 {
@@ -41,22 +39,73 @@ namespace GraphAPI.Controllers
             return node;
         }
 
-        // GET: api/nodes/children
-        [HttpGet("children/{id}")]
-        public async Task<ActionResult<List<long>>> GetChildrenNodes(long id)
+        // GET: api/nodes/displaychildren/5/1
+        [HttpGet("displaychildren/{id}/{search_depth}")]
+        public async Task<ActionResult<Dictionary<string, ChildrenNodesResponse>>> GetChildrenNodes(long id, int search_depth)
         {
+            Dictionary<string, ChildrenNodesResponse> payload_response = new Dictionary<string, ChildrenNodesResponse>();
+            List<long> node_ids = [id];
+
+            int current_search_depth = 0;
+            int search_pointer = 0;
+            int layer_end_pointer;
+
             if (!nodeExists(id))
             {
                 return NotFound();
             }
 
-            var children = await _context.edge
-                .Where(t => t.head_node == id)
-                .Select(h => h.tail_node)
-                .ToListAsync();
+            while (current_search_depth <= search_depth)
+            {
+                layer_end_pointer = node_ids.Count;
+                while (search_pointer < layer_end_pointer) {
+                    long current_node_id = node_ids[search_pointer];
 
+                    ChildrenNodesResponse node_section = new ChildrenNodesResponse();
+
+                    node_section.node_name = (await _context.node.FindAsync(current_node_id)).name;
+
+                    List<ChildAndEdgeType> child_and_edges = await GetChildrenAndEdgetypes(current_node_id);
+
+                    foreach (var child_and_edge in child_and_edges)
+                    {   
+                        long child_id = child_and_edge.child_id;
+                        long edge_id = child_and_edge.edge_type_id;
+
+                        node_ids.Add(child_id);
+                        node_section.children_nodes.Add(child_id.ToString(), edge_id.ToString());
+                    }
+
+                    payload_response.Add(current_node_id.ToString(), node_section);
+                    search_pointer++;
+                }
+                current_search_depth++;
+            }
+
+            return Ok(payload_response);
+        }
+        private async Task<List<long>> GetChildren(long id)
+        {
+            List<long> children = await _context.edge
+                .Where(t => t.headnodeid == id)
+                .Select(h => h.tailnodeid)
+                .ToListAsync();
             return children;
         }
+
+        private async Task<List<ChildAndEdgeType>> GetChildrenAndEdgetypes(long id)
+        {
+               var children = await _context.edge
+                .Where(t => t.headnodeid == id)
+                .Select(h => new ChildAndEdgeType
+                {
+                    child_id = h.tailnodeid,
+                    edge_type_id = h.edgetypeid
+                })
+                .ToListAsync();
+            return children;
+        }
+
 
         // GET: api/nodes/parents
         [HttpGet("parents/{id}")]
@@ -68,8 +117,8 @@ namespace GraphAPI.Controllers
             }
 
             var children = await _context.edge
-                .Where(t => t.tail_node == id)
-                .Select(h => h.head_node)
+                .Where(t => t.tailnodeid == id)
+                .Select(h => h.headnodeid)
                 .ToListAsync();
 
             return children;
@@ -88,7 +137,7 @@ namespace GraphAPI.Controllers
             while (parents_to_search.Count > 0)
             {
                 long current_node = parents_to_search[0];
-                children_to_search = (await GetChildrenNodes(current_node)).Value;
+                children_to_search = (await GetChildren(current_node));
                 foreach (long child_id in children_to_search)
                 {
                     List<long> parents = (await GetParentNodes(child_id)).Value;
@@ -159,27 +208,31 @@ namespace GraphAPI.Controllers
                 }
                 node.graphid = partial_node.graphid;
             }
-            if (partial_node.nodetype != 0)
+            if (partial_node.nodetypeid != 0)
             {
                 if (!_context.nodetype.Any(e => e.nodetypeid == id))
                 {
                     return BadRequest();
                 }
-                node.nodetype = partial_node.nodetype;
+                node.nodetypeid = partial_node.nodetypeid;
             }
             if (partial_node.classification != 0)
             {
                 node.classification = partial_node.classification;
             }
-            if (partial_node.copywriteowner != "")
+            if (partial_node.copyrightowner != "")
             {
-                node.copywriteowner = partial_node.copywriteowner;
+                node.copyrightowner = partial_node.copyrightowner;
             }
             if (partial_node.version != "")
             {
                 node.version = partial_node.version;
             }
-
+            if (partial_node.payload.ToString().Length > 2)
+            {
+                node.payload = partial_node.payload;
+            }
+            System.Diagnostics.Debug.WriteLine(node.ToString());
             try
             {
                 await _context.SaveChangesAsync();
@@ -226,7 +279,7 @@ namespace GraphAPI.Controllers
             await Postnode(node);
 
             _context.edge.Add(
-                new edge { edgetypeid = edgetype_id, head_node = headnode_id, tail_node = node.nodeid }
+                new edge { edgetypeid = edgetype_id, headnodeid = headnode_id, tailnodeid = node.nodeid }
             );
 
             await _context.SaveChangesAsync();
@@ -256,7 +309,8 @@ namespace GraphAPI.Controllers
                 var node = await _context.node.FindAsync(node_id);
                 _context.node.Remove(node);
                 var edges_removed = await EdgeRemoval(node_id);
-                deleted_edge_ids.Concat(edges_removed);
+                //deleted_edge_ids.Concat(edges_removed);
+                deleted_edge_ids.AddRange(edges_removed);
             };
 
             _context.node.Remove(root_node);
@@ -278,7 +332,7 @@ namespace GraphAPI.Controllers
         private async Task<List<long>> EdgeRemoval(long node_id)
         {
             var edges = await _context.edge
-                .Where(t => t.tail_node == node_id | t.head_node == node_id)
+                .Where(t => t.tailnodeid == node_id | t.headnodeid == node_id)
                 .Select(k => k.edgeid)
                 .ToListAsync();
 

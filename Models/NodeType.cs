@@ -14,10 +14,10 @@ namespace GraphAPI.Models
 
         public string name { get; set; }
 
-        [Column(TypeName = "json")]
+        [Column(TypeName = "jsonb")]
         public JsonDocument fields { get; set; }
 
-        [Column(TypeName = "json")]
+        [Column(TypeName = "jsonb")]
         public JsonDocument settings { get; set; }
 
     }
