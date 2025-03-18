@@ -3,6 +3,10 @@
     public class ChildrenNodesResponse
     {
         public string node_name { get; set; }
+
+        public float x { get; set; }
+        public float y { get; set; }
+
         public Dictionary<string, string> children_nodes { get; set; }
 
         public ChildrenNodesResponse()

@@ -10,6 +10,7 @@ namespace GraphAPI.Controllers
     public class nodesController : ControllerBase
     {
         private readonly GraphAPIContext _context;
+        private GraphArrangement GraphArrangement = new GraphArrangement(new Dictionary<long, long>());
 
         public nodesController(GraphAPIContext context)
         {
@@ -75,6 +76,9 @@ namespace GraphAPI.Controllers
                         node_ids.Add(child_id);
                         node_section.children_nodes.Add(child_id.ToString(), edge_id.ToString());
                     }
+
+                    node_section.x = GraphArrangement.getNodePos(current_node_id).X;
+                    node_section.y = GraphArrangement.getNodePos(current_node_id).Y;
 
                     payload_response.Add(current_node_id.ToString(), node_section);
                     search_pointer++;

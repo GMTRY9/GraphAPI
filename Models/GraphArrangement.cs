@@ -20,7 +20,8 @@ namespace GraphAPI.Models
             {
                 return value;
             }
-            return new Vector2(0, 0);
+            Random rnd = new Random();
+            return new Vector2(rnd.Next(-400, 400), rnd.Next(-400, 400));
         }
     }
 }
