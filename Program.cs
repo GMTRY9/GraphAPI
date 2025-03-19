@@ -9,9 +9,20 @@ builder.Services.AddDbContext<GraphAPIContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("GraphAPIContext") ?? throw new InvalidOperationException("Connection string 'GraphAPIContext' not found."))
     );
 
-// Add services to the container.
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://192.168.0.1:5201");
+                      });
+});
+
+// Add services to the container.
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
