@@ -1,0 +1,12 @@
+[
+  {
+    "ContainingType": "GraphAPI.Controllers.ExAPIController",
+    "Method": "GetInfo",
+    "RelativePath": "api/getInfo",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]

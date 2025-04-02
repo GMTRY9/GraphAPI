@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Text.Json;
+using Newtonsoft.Json.Linq;
 
 namespace GraphAPI.Models
 {

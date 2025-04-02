@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using GraphAPI.Data;
 using GraphAPI.Models;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace GraphAPI.Controllers
 {
@@ -106,6 +107,7 @@ namespace GraphAPI.Controllers
                     child_id = h.tailnodeid,
                     edge_type_id = h.edgetypeid
                 })
+                // For loop?
                 .ToListAsync();
             return children;
         }
@@ -124,9 +126,28 @@ namespace GraphAPI.Controllers
                 .Where(t => t.tailnodeid == id)
                 .Select(h => h.headnodeid)
                 .ToListAsync();
-
             return children;
         }
+
+        //[HttpGet("generic/")]
+        //public async Task<ActionResult<List<object>>> GetGenericObject()
+        //{
+        //    List<>//something in list, but it could be any type so god knows what to put here
+        //    var generic_object = await // some form of instance e.g _context.something
+        //        .Where(s => new GenericObject
+        //        {
+        //            // whatever conditions you want to apply in either the form of a dict or a list???
+        //        }
+        //        )
+        //        .
+        //        Select(s => new GenericObject
+        //        {
+        //            // whatever fields you want to return either in the form of a dict or a list???
+        //        })
+        //        .ToListAsync();
+        //    return nodes;
+        //}
+
 
         // GET: api/nodes/deletionnodes/5
         [HttpGet("deletionnodes/{id}")]

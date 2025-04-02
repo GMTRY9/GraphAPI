@@ -11,6 +11,6 @@ namespace GraphAPI.Models
         [SwaggerIgnore]
         public long edgetypeid { get; set; }
 
-        public required string name { get; set; }
+        public string name { get; set; }
     }
 }
